@@ -36,13 +36,13 @@ tests/
 
 > Convención de namespaces (igual que el microservicio de referencia de la clase, Inmoby): **proyecto + carpeta**. Ejemplo:
 > `FH.Customers.Application.UseCases.Beneficiaries.Commands.AddBeneficiary` está en
-> `src/FH.Customers.Application/UseCases/Beneficiaries/Commands/AddBeneficiary/`.
+> `Customers/src/FH.Customers.Application/UseCases/Beneficiaries/Commands/AddBeneficiary/`.
 
 ## Migraciones (un solo DbContext: `CustomerDbContext`, en `FH.Customers.Persistence`)
 
 ```bash
-dotnet ef migrations add <Nombre> --project src/FH.Customers.Persistence --startup-project src/FH.Customers.Api
-dotnet ef database update         --project src/FH.Customers.Persistence --startup-project src/FH.Customers.Api
+dotnet ef migrations add <Nombre> --project Customers/src/FH.Customers.Persistence --startup-project Customers/src/FH.Customers.Api
+dotnet ef database update         --project Customers/src/FH.Customers.Persistence --startup-project Customers/src/FH.Customers.Api
 ```
 
 ### Primera vez tras los value objects
