@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using FH.Customers.Application.Utilities.Mediator;
 using FH.Customers.Application.UseCases.Beneficiaries.Commands.AddBeneficiary;
@@ -13,10 +14,12 @@ namespace FH.Customers.Api.Controllers;
 
 [Route("api/v1/subscriptions/{subscriptionId:guid}/beneficiaries")]
 [Tags("Beneficiaries")]
+[Authorize] // Lecturas: cualquier usuario autenticado. Escrituras: Admin u Operator.
 public class BeneficiariesController(IMediator mediator) : ApiControllerBase(mediator)
 {
-    /// <summary>Incorporar un beneficiario (persona o mascota) a una suscripción activa</summary>
+    /// <summary>Incorporar un beneficiario (persona o mascota) a una suscripción activa. Requiere rol Admin u Operator.</summary>
     [HttpPost]
+    [Authorize(Roles = "Admin,Operator")]
     [ProducesResponseType(typeof(BeneficiaryResponse), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -68,8 +71,9 @@ public class BeneficiariesController(IMediator mediator) : ApiControllerBase(med
         return result.IsFailure ? ToError(result) : Ok(result.Value);
     }
 
-    /// <summary>Desafiliar a un beneficiario de una suscripción funeraria</summary>
+    /// <summary>Desafiliar a un beneficiario de una suscripción funeraria. Requiere rol Admin u Operator.</summary>
     [HttpDelete("{memberId:guid}")]
+    [Authorize(Roles = "Admin,Operator")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
@@ -85,8 +89,9 @@ public class BeneficiariesController(IMediator mediator) : ApiControllerBase(med
         return result.IsFailure ? ToError(result) : NoContent();
     }
 
-    /// <summary>Reincorporar a un beneficiario retirado a la misma suscripción (revisa estado, cupo y documento)</summary>
+    /// <summary>Reincorporar a un beneficiario retirado a la misma suscripción (revisa estado, cupo y documento). Requiere rol Admin u Operator.</summary>
     [HttpPatch("{memberId:guid}/reactivate")]
+    [Authorize(Roles = "Admin,Operator")]
     [ProducesResponseType(typeof(BeneficiaryResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
@@ -103,8 +108,9 @@ public class BeneficiariesController(IMediator mediator) : ApiControllerBase(med
         return result.IsFailure ? ToError(result) : Ok(result.Value);
     }
 
-    /// <summary>Actualizar los datos de un beneficiario activo (el tipo de sujeto y el parentesco no cambian)</summary>
+    /// <summary>Actualizar los datos de un beneficiario activo (el tipo de sujeto y el parentesco no cambian). Requiere rol Admin u Operator.</summary>
     [HttpPut("{memberId:guid}")]
+    [Authorize(Roles = "Admin,Operator")]
     [ProducesResponseType(typeof(BeneficiaryResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
