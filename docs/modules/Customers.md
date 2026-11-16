@@ -82,14 +82,14 @@ Api/
 | `PUT` | `/api/v1/customers/{id}` | Actualizar datos de contacto y nombre | `200` | `400`, `404` |
 | `PATCH` | `/api/v1/customers/{id}/status` | Cambiar estado | `204` | `400`, `404`, `409` |
 
-Ejemplos listos para ejecutar en [`FH.Customers.Api.http`](../../src/FH.Customers.Api/FH.Customers.Api.http), que cubre los casos felices y **todos** los errores de dominio. Swagger disponible en `/swagger` con la especificación OpenAPI 3.
+Ejemplos listos para ejecutar en [`FH.Customers.Api.http`](../../Customers/src/FH.Customers.Api/FH.Customers.Api.http), que cubre los casos felices y **todos** los errores de dominio. Swagger disponible en `/swagger` con la especificación OpenAPI 3.
 
 ---
 
 ## 5. Pruebas
 
 ```bash
-dotnet test FuneralHomes.Customers.slnx
+dotnet test Customers/Customers.slnx
 ```
 
 **36 pruebas, todas en verde.** Suite en `tests/FH.Customers.Tests`:

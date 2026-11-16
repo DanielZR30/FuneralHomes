@@ -5,8 +5,8 @@
  ATENCIÓN: borra todos los datos de la base de desarrollo.
 #>
 $ErrorActionPreference = "Stop"
-$persistence = "src/FH.Customers.Persistence"
-$startup     = "src/FH.Customers.Api"
+$persistence = "Customers/src/FH.Customers.Persistence"
+$startup     = "Customers/src/FH.Customers.Api"
 
 Write-Host "1/4 Borrando base de datos..." -ForegroundColor Cyan
 dotnet ef database drop --force --project $persistence --startup-project $startup
