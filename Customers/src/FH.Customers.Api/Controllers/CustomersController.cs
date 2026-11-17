@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using FH.Customers.Application.Utilities.Mediator;
 using FH.Customers.Application.UseCases.Customers.Commands.ChangeCustomerStatus;
@@ -14,10 +15,12 @@ namespace FH.Customers.Api.Controllers;
 
 [Route("api/v1/customers")]
 [Tags("Customers")]
+[Authorize] // Lecturas: cualquier usuario autenticado (JWT de Identity). Escrituras: Admin u Operator.
 public class CustomersController(IMediator mediator) : ApiControllerBase(mediator)
 {
-    /// <summary>Registrar un nuevo cliente titular (Persona Natural o Empresa)</summary>
+    /// <summary>Registrar un nuevo cliente titular (Persona Natural o Empresa). Requiere rol Admin u Operator.</summary>
     [HttpPost]
+    [Authorize(Roles = "Admin,Operator")]
     [ProducesResponseType(typeof(CustomerResponse), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
@@ -84,8 +87,9 @@ public class CustomersController(IMediator mediator) : ApiControllerBase(mediato
         return result.IsFailure ? ToError(result) : Ok(result.Value);
     }
 
-    /// <summary>Actualizar datos demográficos y de contacto (el documento de identificación es inmutable)</summary>
+    /// <summary>Actualizar datos demográficos y de contacto (el documento de identificación es inmutable). Requiere rol Admin u Operator.</summary>
     [HttpPut("{id:guid}")]
+    [Authorize(Roles = "Admin,Operator")]
     [ProducesResponseType(typeof(CustomerResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -106,8 +110,9 @@ public class CustomersController(IMediator mediator) : ApiControllerBase(mediato
         return result.IsFailure ? ToError(result) : Ok(result.Value);
     }
 
-    /// <summary>Modificar estado de un cliente (Activar, Suspender, Inactivar)</summary>
+    /// <summary>Modificar estado de un cliente (Activar, Suspender, Inactivar). Requiere rol Admin u Operator.</summary>
     [HttpPatch("{id:guid}/status")]
+    [Authorize(Roles = "Admin,Operator")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
