@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using FH.Customers.Application.Utilities.Mediator;
 using FH.Customers.Application.UseCases.CustomerPlans.Commands.CancelSubscription;
@@ -14,10 +15,12 @@ namespace FH.Customers.Api.Controllers;
 
 [Route("api/v1/subscriptions")]
 [Tags("Subscriptions")]
+[Authorize] // Lecturas: cualquier usuario autenticado. Escrituras: Admin u Operator.
 public class SubscriptionsController(IMediator mediator) : ApiControllerBase(mediator)
 {
-    /// <summary>Suscribir cliente titular a un plan funerario con límite de cupos</summary>
+    /// <summary>Suscribir cliente titular a un plan funerario con límite de cupos. Requiere rol Admin u Operator.</summary>
     [HttpPost]
+    [Authorize(Roles = "Admin,Operator")]
     [ProducesResponseType(typeof(SubscriptionDto), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -54,8 +57,9 @@ public class SubscriptionsController(IMediator mediator) : ApiControllerBase(med
         return result.IsFailure ? ToErrorWithCode(result) : Ok(result.Value);
     }
 
-    /// <summary>Cancelar una suscripción de previsión funeraria</summary>
+    /// <summary>Cancelar una suscripción de previsión funeraria. Requiere rol Admin u Operator.</summary>
     [HttpPatch("{id:guid}/cancel")]
+    [Authorize(Roles = "Admin,Operator")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
@@ -66,8 +70,9 @@ public class SubscriptionsController(IMediator mediator) : ApiControllerBase(med
         return result.IsFailure ? ToErrorWithCode(result) : NoContent();
     }
 
-    /// <summary>Modificar el cupo máximo de beneficiarios de una suscripción activa</summary>
+    /// <summary>Modificar el cupo máximo de beneficiarios de una suscripción activa. Requiere rol Admin u Operator.</summary>
     [HttpPatch("{id:guid}/max-beneficiaries")]
+    [Authorize(Roles = "Admin,Operator")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]

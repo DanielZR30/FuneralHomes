@@ -1,3 +1,6 @@
+using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 using FH.Customers.Application;
 using FH.Customers.Infrastructure;
@@ -10,6 +13,32 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddApplication();
 builder.Services.AddPersistence(builder.Configuration);
 builder.Services.AddInfrastructure(builder.Configuration);
+
+// Autenticación: valida los JWT emitidos por Identity (fh.api.identity). Contrato compartido:
+// issuer fh.api.identity, audiencia fh-apis, HS256, ClockSkew cero (token expirado falla al segundo).
+// RoleClaimType "role" + MapInboundClaims false para que [Authorize(Roles=...)] lea el claim "role" del JWT.
+builder.Services
+    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        var jwt = builder.Configuration.GetSection("Jwt");
+        options.MapInboundClaims = false;
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidIssuer = jwt["Issuer"],
+            ValidateAudience = true,
+            ValidAudience = jwt["Audience"],
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwt["SigningKey"]!)),
+            ValidateLifetime = true,
+            ClockSkew = TimeSpan.Zero,
+            RoleClaimType = "role",
+            NameClaimType = "name"
+        };
+    });
+
+builder.Services.AddAuthorization();
 
 // Controladores (Presentation). Enums como texto legible (ej: "Individual", "Human", "Child").
 // SuppressImplicitRequired...: no exigir campos "no nulos" a nivel de framework; las reglas las valida la aplicación.
@@ -27,6 +56,23 @@ builder.Services.AddSwaggerGen(options =>
         Title = "Funeral Homes - Customers Microservice API",
         Version = "v1",
         Description = "Microservicio para la gestión de titulares (B2C/B2B), suscripciones a planes y beneficiarios (fh.api.customer)."
+    });
+    // Soporte de Bearer: pegar el token de POST /api/v1/auth/login de Identity para probar los endpoints protegidos
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Description = "Pega aquí el accessToken devuelto por POST /api/v1/auth/login de Identity (sin la palabra Bearer)."
+    });
+    options.AddSecurityRequirement(_ => new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecuritySchemeReference("Bearer"),
+            new List<string>()
+        }
     });
 });
 
@@ -99,6 +145,10 @@ app.UseExceptionHandler(exceptionHandlerApp =>
         await context.Response.WriteAsJsonAsync(problemDetails);
     });
 });
+
+// Autenticación (JWT de Identity) y autorización (roles Admin/Operator/Auditor en los controllers)
+app.UseAuthentication();
+app.UseAuthorization();
 
 // Redireccionar raíz a swagger
 app.MapGet("/", () => Results.Redirect("/swagger")).ExcludeFromDescription();

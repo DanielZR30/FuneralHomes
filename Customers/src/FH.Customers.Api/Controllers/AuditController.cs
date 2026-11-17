@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using FH.Customers.Application.Utilities.Mediator;
 using FH.Customers.Application.UseCases.Audit.Queries.GetMemberAuditLog;
@@ -7,6 +8,7 @@ using FH.Customers.Application.UseCases.Audit.Common;
 namespace FH.Customers.Api.Controllers;
 
 [Tags("Audit")]
+[Authorize(Roles = "Admin,Auditor")] // El histórico de auditoría solo lo consultan Admin y Auditor (HTTP 403 para Operator).
 public class AuditController(IMediator mediator) : ApiControllerBase(mediator)
 {
     /// <summary>Consultar historial cronológico inmutable de novedades de una suscripción (Módulo Audit)</summary>
