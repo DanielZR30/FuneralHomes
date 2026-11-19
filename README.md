@@ -44,11 +44,17 @@ FuneralHomes/
 # 1. PostgreSQL (una sola instancia para los tres microservicios)
 docker run --name fh-pg -e POSTGRES_PASSWORD=secret -p 5432:5432 -d postgres:16
 
-# 2. Base de datos del microservicio Customers
+# 2. Bases de datos (Customers, Identity y Financials)
 .\scripts\reset-db.ps1
+.\scripts\reset-db-identity.ps1
+.\scripts\reset-db-financials.ps1
 
-# 3. Ejecutar la API de Customers (Swagger en https://localhost:7035/swagger)
-dotnet run --project Customers/src/FH.Customers.Api --launch-profile https
+# 3. Levantar los tres servicios (Swagger en /swagger de cada puerto https)
+.\scripts\run-all.ps1
+
+# 4. Pruebas de humo (con los tres servicios arriba)
+.\scripts\smoke-test-auth.ps1
+.\scripts\smoke-test.ps1
 ```
 
 Cada microservicio tiene su propio `README.md` con instrucciones detalladas.

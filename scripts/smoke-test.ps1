@@ -1,12 +1,15 @@
 <#
  Prueba de humo de TODO el microservicio (Customers, Subscriptions, Beneficiaries, Audit).
- Uso (con la API corriendo):   .\scripts\smoke-test.ps1
- Otra URL:                     .\scripts\smoke-test.ps1 -BaseUrl https://localhost:7035
+ Uso (Identity, Financials y Customers corriendo):   .\scripts\smoke-test.ps1
+ Otra URL:                              .\scripts\smoke-test.ps1 -BaseUrl https://localhost:7035 -IdentityUrl https://localhost:7036
+ Crear suscripción valida el plan contra Financials (https://localhost:7037); si ese servicio no está arriba, esa prueba falla aunque el login funcione.
  Cada corrida usa documentos únicos, se puede repetir cuantas veces quieras.
+ Los endpoints están protegidos: primero inicia sesión en Identity (Admin) y envía el JWT en cada llamada.
 #>
-param([string]$BaseUrl = "https://localhost:7035")
+param([string]$BaseUrl = "https://localhost:7035", [string]$IdentityUrl = "https://localhost:7036")
 
 $script:results = @()
+$script:Token = $null
 $run = Get-Random -Minimum 100000 -Maximum 999999
 $tmpBody = Join-Path $env:TEMP "fh-smoke-body.json"
 $tmpOut  = Join-Path $env:TEMP "fh-smoke-out.txt"
@@ -14,6 +17,7 @@ $tmpOut  = Join-Path $env:TEMP "fh-smoke-out.txt"
 # Usa curl.exe (incluido en Windows 10/11): -k acepta el certificado de desarrollo de https://localhost
 function Call([string]$Name, [string]$Method, [string]$Path, $Body, [int]$Expected) {
     $args = @("-k", "-s", "-o", $tmpOut, "-w", "%{http_code}", "-X", $Method, "$BaseUrl$Path")
+    if ($script:Token) { $args += @("-H", "Authorization: Bearer $($script:Token)") }
     if ($null -ne $Body) {
         $json = $Body | ConvertTo-Json -Depth 5
         [System.IO.File]::WriteAllText($tmpBody, $json, (New-Object System.Text.UTF8Encoding($false)))
@@ -37,6 +41,22 @@ function Call([string]$Name, [string]$Method, [string]$Path, $Body, [int]$Expect
 }
 
 $doc = "SMK$run"
+
+# ---------- Login en Identity (los endpoints de Customers están protegidos por JWT) ----------
+$loginFile = Join-Path $env:TEMP "fh-smoke-login.json"
+[System.IO.File]::WriteAllText($loginFile, (@{ email = "admin@funeralhomes.local"; password = "Admin*2026" } | ConvertTo-Json), (New-Object System.Text.UTF8Encoding($false)))
+$loginRaw = & curl.exe -k -s -X POST "$IdentityUrl/api/v1/auth/login" -H "Content-Type: application/json" --data-binary "@$loginFile"
+$login = $null
+if ($loginRaw -and "$loginRaw".TrimStart().StartsWith("{")) { $login = $loginRaw | ConvertFrom-Json }
+if ($login -and $login.accessToken) {
+    $script:Token = $login.accessToken
+    $loginOk = $true
+}
+$script:results += [pscustomobject]@{ Prueba = "Login Admin en Identity"; Esperado = 200; Recibido = $(if ($loginOk) { 200 } else { 0 }); Resultado = $(if ($loginOk) { "OK" } else { "FALLA" }) }
+if (-not $loginOk) {
+    Write-Host "  [FALLA] No se pudo iniciar sesion en $IdentityUrl ¿esta corriendo Identity?" -ForegroundColor Red
+    $script:results | Format-Table -AutoSize; exit 1
+}
 
 # ---------- Salud ----------
 Call "Salud" GET "/health" $null 200 | Out-Null
