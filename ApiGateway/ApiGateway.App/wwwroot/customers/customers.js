@@ -16,10 +16,10 @@ if (Ui.init("/customers/")) {
       Ui.el("td", {}, c.customerType === "Corporate" ? "Empresa" : "Persona natural"),
       Ui.el("td", {}, `${c.identificationType} ${c.identificationNumber}`),
       Ui.el("td", {}, c.email || "—"),
-      Ui.el("td", {}, Ui.el("span", { class: `status ${c.status}` }, c.status)),
+      Ui.el("td", {}, Ui.el("span", { class: `status ${c.status}` }, Ui.label(c.status))),
       Ui.el("td", {}, Ui.el("select", { onchange: (e) => changeStatus(c.id, e.target.value) },
-        Ui.el("option", { value: "" }, "Cambiar a..."),
-        STATUSES.filter((s) => s !== c.status).map((s) => Ui.el("option", { value: s }, s)))))));
+        Ui.el("option", { value: "" }, "Cambiar a…"),
+        STATUSES.filter((s) => s !== c.status).map((s) => Ui.el("option", { value: s }, Ui.label(s))))))));
     empty.hidden = res.data.length > 0;
   }
 

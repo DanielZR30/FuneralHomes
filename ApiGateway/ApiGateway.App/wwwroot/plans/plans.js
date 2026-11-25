@@ -15,7 +15,7 @@ if (Ui.init("/plans/")) {
       Ui.el("td", {}, p.description || "—"),
       Ui.el("td", {}, money(p.baseMonthlyFee)),
       Ui.el("td", {}, String(p.maxBeneficiaries)),
-      Ui.el("td", {}, Ui.el("span", { class: `status ${p.status === "Active" ? "Active" : "Inactive"}` }, p.status)),
+      Ui.el("td", {}, Ui.el("span", { class: `status ${p.status === "Active" ? "Active" : "Inactive"}` }, Ui.label(p.status))),
       Ui.el("td", {}, Ui.el("button", { class: "secondary", type: "button", onclick: () => openQuote(p) }, "Cotizar")))));
     empty.hidden = res.data.length > 0;
   }
@@ -25,7 +25,7 @@ if (Ui.init("/plans/")) {
       Ui.el("select", { "data-f": "subjectType" }, Ui.el("option", { value: "Human" }, "Persona"), Ui.el("option", { value: "Pet" }, "Mascota")),
       Ui.el("input", { "data-f": "derivedAge", type: "number", min: "0", max: "120", value: "30", style: "width:80px", title: "Edad" }),
       Ui.el("select", { "data-f": "relationshipType" },
-        ["Principal", "Spouse", "Child", "Parent", "Employee", "Pet", "Other"].map((r) => Ui.el("option", { value: r }, r))),
+        ["Principal", "Spouse", "Child", "Parent", "Employee", "Pet", "Other"].map((r) => Ui.el("option", { value: r }, Ui.label(r)))),
       Ui.el("button", { class: "secondary", type: "button", onclick: () => row.remove() }, "Quitar"));
     return row;
   }
@@ -53,7 +53,7 @@ if (Ui.init("/plans/")) {
     const q = res.data;
     out.replaceChildren(
       Ui.el("p", {}, `Cuota base: ${money(q.baseMonthlyFee)}`),
-      ...q.surcharges.map((s) => Ui.el("p", { class: "hint" }, `${s.subjectType} · ${s.derivedAge} años · ${s.relationshipType}: +${money(s.surcharge)}`)),
+      ...q.surcharges.map((s) => Ui.el("p", { class: "hint" }, `${Ui.label(s.subjectType)} · ${s.derivedAge} años · ${Ui.label(s.relationshipType)}: +${money(s.surcharge)}`)),
       Ui.el("p", {}, Ui.el("strong", {}, `Total mensual: ${money(q.totalMonthlyFee)}`)));
   });
 

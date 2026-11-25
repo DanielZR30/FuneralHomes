@@ -22,6 +22,15 @@ const Ui = (() => {
     { href: "/plans/", label: "Planes" }
   ];
 
+  // Textos en español para valores que el API devuelve en inglés (el valor enviado al API no cambia)
+  const LABELS = {
+    Active: "Activo", Inactive: "Inactivo", Suspended: "Suspendido", Cancelled: "Cancelada", Canceled: "Cancelada", Removed: "Retirado",
+    Individual: "Persona natural", Corporate: "Empresa", Human: "Persona", Pet: "Mascota",
+    Principal: "Principal", Associated: "Asociado",
+    Titular: "Titular", Spouse: "Cónyuge", Child: "Hijo(a)", Parent: "Padre/madre", Employee: "Empleado", Other: "Otro"
+  };
+  const label = (v) => LABELS[v] || v;
+
   function renderNav(activeHref) {
     const u = Api.user();
     const nav = el("header", { class: "topbar" },
@@ -77,5 +86,5 @@ const Ui = (() => {
     return true;
   }
 
-  return { el, show, init };
+  return { el, show, init, label };
 })();
