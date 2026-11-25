@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Funeral Homes · Ingreso</title>
+  <link rel="stylesheet" href="/css/app.css">
+</head>
+<body>
+  <main class="login">
+    <h1>Funeral Homes</h1>
+    <div class="card">
+      <h2>Iniciar sesión</h2>
+      <div id="message" class="message info" hidden></div>
+      <form id="form">
+        <label class="field">Correo<input id="email" type="email" required autocomplete="username"></label>
+        <label class="field" style="margin-top:10px">Contraseña<input id="password" type="password" required autocomplete="current-password"></label>
+        <div class="row"><button type="submit">Ingresar</button></div>
+      </form>
+      <p class="hint">Usuarios de demostración (los crea el seeder de Identity):</p>
+      <div class="demo" id="demo"></div>
+    </div>
+  </main>
+  <script src="/js/api.js"></script>
+  <script src="/js/ui.js"></script>
+  <script>
+    const DEMO = [
+      ["Admin", "admin@funeralhomes.local", "Admin*2026"],
+      ["Operator", "operator@funeralhomes.local", "Operator*2026"],
+      ["Auditor", "auditor@funeralhomes.local", "Auditor*2026"]
+    ];
+    const email = document.getElementById("email");
+    const password = document.getElementById("password");
+
+    DEMO.forEach(([rol, mail, pass]) => document.getElementById("demo").append(
+      Ui.el("button", { type: "button", class: "secondary", onclick: () => { email.value = mail; password.value = pass; } }, rol)));
+
+    document.getElementById("form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      Ui.show("Ingresando...", "info");
+      const res = await Api.login(email.value.trim(), password.value);
+      if (res.ok) { window.location.href = "/customers/"; return; }
+      Ui.show(res.status === 401 ? "Credenciales inválidas (401)." : Api.errorMessage(res), "err");
+    });
+  </script>
+</body>
+</html>

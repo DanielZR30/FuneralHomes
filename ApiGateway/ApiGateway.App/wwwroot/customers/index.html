@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Funeral Homes · Clientes</title>
+  <link rel="stylesheet" href="/css/app.css">
+</head>
+<body>
+  <main>
+    <h1>Clientes</h1>
+    <div id="message" class="message info" hidden></div>
+
+    <section class="card">
+      <h2>Nuevo cliente</h2>
+      <form id="form">
+        <div class="grid">
+          <label class="field">Tipo
+            <select id="customerType"><option value="Individual">Persona natural</option><option value="Corporate">Empresa</option></select></label>
+          <label class="field">Tipo de documento
+            <select id="identificationType"><option>CC</option><option>CE</option><option>TI</option><option>RC</option><option>PA</option><option>NIT</option></select></label>
+          <label class="field">Número de documento<input id="identificationNumber" required></label>
+          <label class="field">Nombre<input id="name" required></label>
+          <label class="field">Correo<input id="email" type="email"></label>
+          <label class="field">Teléfono<input id="phone"></label>
+          <label class="field">Dirección<input id="address"></label>
+        </div>
+        <div class="row"><button type="submit">Crear cliente</button></div>
+      </form>
+    </section>
+
+    <section class="card">
+      <div class="row" style="margin-top:0;justify-content:space-between">
+        <h2 style="margin:0">Listado</h2>
+        <div class="row" style="margin:0">
+          <label class="field" style="flex-direction:row;align-items:center;gap:8px">Estado
+            <select id="filter"><option value="">Todos</option><option>Active</option><option>Suspended</option><option>Inactive</option></select></label>
+          <button class="secondary" id="reload" type="button">Actualizar</button>
+        </div>
+      </div>
+      <table>
+        <thead><tr><th>Nombre</th><th>Tipo</th><th>Documento</th><th>Correo</th><th>Estado</th><th>Cambiar estado</th></tr></thead>
+        <tbody id="rows"></tbody>
+      </table>
+      <p class="hint" id="empty" hidden>No hay clientes para mostrar.</p>
+    </section>
+  </main>
+  <script src="/js/api.js"></script>
+  <script src="/js/ui.js"></script>
+  <script src="/customers/customers.js"></script>
+</body>
+</html>
