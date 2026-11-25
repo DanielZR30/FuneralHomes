@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Funeral Homes · Planes</title>
+  <link rel="stylesheet" href="/css/app.css">
+</head>
+<body>
+  <main>
+    <h1>Planes</h1>
+    <div id="message" class="message info" hidden></div>
+
+    <section class="card">
+      <h2>Catálogo (Financials)</h2>
+      <table>
+        <thead><tr><th>Nombre</th><th>Descripción</th><th>Cuota base</th><th>Máx. beneficiarios</th><th>Estado</th><th></th></tr></thead>
+        <tbody id="rows"></tbody>
+      </table>
+      <p class="hint" id="empty" hidden>No hay planes en el catálogo.</p>
+    </section>
+
+    <section class="card" id="quoteCard" hidden>
+      <h2>Cotizar: <span id="quotePlan"></span></h2>
+      <div id="beneficiaries"></div>
+      <div class="row">
+        <button class="secondary" id="addBen" type="button">+ Beneficiario</button>
+        <button id="doQuote" type="button">Calcular cuota</button>
+      </div>
+      <div id="quoteResult" style="margin-top:12px"></div>
+    </section>
+
+    <section class="card">
+      <h2>Nuevo plan <span class="hint">(solo Admin; con otro rol responde 403)</span></h2>
+      <form id="form">
+        <div class="grid">
+          <label class="field">Nombre<input id="name" required></label>
+          <label class="field">Descripción<input id="description"></label>
+          <label class="field">Cuota mensual base<input id="baseMonthlyFee" type="number" min="0" step="1000" required></label>
+          <label class="field">Máx. beneficiarios<input id="maxBeneficiaries" type="number" min="1" value="4" required></label>
+        </div>
+        <div class="row"><button type="submit">Crear plan</button></div>
+      </form>
+    </section>
+  </main>
+  <script src="/js/api.js"></script>
+  <script src="/js/ui.js"></script>
+  <script src="/plans/plans.js"></script>
+</body>
+</html>

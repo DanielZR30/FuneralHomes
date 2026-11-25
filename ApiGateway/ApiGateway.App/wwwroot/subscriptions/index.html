@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Funeral Homes · Suscripciones</title>
+  <link rel="stylesheet" href="/css/app.css">
+</head>
+<body>
+  <main>
+    <h1>Suscripciones</h1>
+    <div id="message" class="message info" hidden></div>
+
+    <section class="card">
+      <h2>Nueva suscripción</h2>
+      <p class="hint">Customers valida el plan llamando a Financials (comunicación síncrona entre microservicios).</p>
+      <form id="form">
+        <div class="grid">
+          <label class="field">Cliente (Customers)<select id="customer" required></select></label>
+          <label class="field">Plan (Financials)<select id="plan" required></select></label>
+          <label class="field">Máx. beneficiarios<input id="maxBeneficiaries" type="number" min="1" value="4" required></label>
+          <label class="field">Fecha de inicio<input id="startDate" type="date" required></label>
+        </div>
+        <div class="row">
+          <button type="submit">Crear suscripción</button>
+          <label class="hint"><input type="checkbox" id="fakePlan"> Usar un plan que no existe (prueba de validación entre servicios)</label>
+        </div>
+      </form>
+    </section>
+
+    <section class="card">
+      <h2>Suscripciones del cliente seleccionado</h2>
+      <table>
+        <thead><tr><th>Plan</th><th>Máx. beneficiarios</th><th>Inicio</th><th>Fin</th><th>Estado</th><th></th></tr></thead>
+        <tbody id="rows"></tbody>
+      </table>
+      <p class="hint" id="empty" hidden>Este cliente no tiene suscripciones.</p>
+    </section>
+  </main>
+  <script src="/js/api.js"></script>
+  <script src="/js/ui.js"></script>
+  <script src="/subscriptions/subscriptions.js"></script>
+</body>
+</html>
